@@ -4,6 +4,12 @@ var bcrypt = require('bcrypt');
 var conn = require('./db');
 var session = require('express-session');
 
+app.use(session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true
+}));
+
 // Set up the view engine
 app.set('view engine', 'ejs');
 
@@ -70,11 +76,10 @@ app.post('/auth', function (request, response) {
       console.log('Password Match', passwordMatch);
 
       if (passwordMatch) {
-        request.session.user = request.body.username;
+        request.session.username = request.body.username;
         request.session.loggedIn = true;
-        response.send('Login Success');
-
-        // TODO: Redirect to product dashboard
+        response.redirect('/product');
+        response.end();
       } else {
         response.redirect('/login');
         response.end();
@@ -86,11 +91,59 @@ app.post('/auth', function (request, response) {
 });
 
 app.get('/product', function (req, res) {
-    // TODO: Check if user is logged in
-    res.render('products');
+    if (!req.session.loggedIn) {
+        res.redirect('/login');
+        res.end();
+    }else{
+        res.render('products');
+    }
 });
 
+// Process rating submission
+app.post('/submit_ratings', function (req, res) {
 
+    if (!req.session.loggedIn) {
+        res.redirect('/login');
+        res.end();
+    }
+
+    console.log('Rating Submission', req.body);
+
+    // Who rated the product
+    console.log('User', req.session.username);
+
+    // Process the rating submission
+
+        var ratings = [
+            {
+                "product_id": 1,
+                "rating": req.body.rating_product1
+            },
+            {
+                "product_id": 2,
+                "rating": req.body.rating_product2
+            },
+            {
+                "product_id": 3,
+                "rating": req.body.rating_product3
+            },
+        ]
+        console.log('Ratings', ratings);
+    // Add to database
+
+        for (var i=0; i<ratings.length; i++) {
+            conn.query(
+                'INSERT INTO ratings (product_id, rating, user) VALUES (?, ?, ?)',
+                [ratings[i].product_id, ratings[i].rating, req.session.username],
+                function (error, results, fields) {
+                    if (error) throw error;
+                    console.log('Rating added to database');
+                },
+            );
+        }
+
+
+});
 
 
 // TODO : Add a route for logout
