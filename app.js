@@ -32,6 +32,25 @@ app.get('/register', function (req, res) {
   res.render('register');
 });
 
+// Routes product page
+app.get('/product', function (req, res) {
+    if (!req.session.loggedIn) {
+        res.redirect('/login');
+        res.end();
+    }else{
+        res.render('products');
+    }
+});
+
+
+// Route for logout
+app.get('/logout', function (req, res) {
+    req.session.destroy();
+    res.redirect('/');
+    res.end();
+    console.log('User logged out');
+});
+
 // Registration Process
 app.post('/reg', function (request, response) {
   console.log('Register Request', request.body);
@@ -90,15 +109,6 @@ app.post('/auth', function (request, response) {
   });
 });
 
-app.get('/product', function (req, res) {
-    if (!req.session.loggedIn) {
-        res.redirect('/login');
-        res.end();
-    }else{
-        res.render('products');
-    }
-});
-
 // Process rating submission
 app.post('/submit_ratings', function (req, res) {
 
@@ -111,6 +121,10 @@ app.post('/submit_ratings', function (req, res) {
 
     // Who rated the product
     console.log('User', req.session.username);
+
+
+    // TODO: check if the user has already rated the product
+    // If the user has already rated the product, update the rating
 
     // Process the rating submission
 
@@ -146,7 +160,6 @@ app.post('/submit_ratings', function (req, res) {
 });
 
 
-// TODO : Add a route for logout
 
 app.listen(3000);
 console.log('Server started on port 3000');
