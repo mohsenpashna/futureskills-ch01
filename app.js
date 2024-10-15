@@ -4,11 +4,13 @@ var bcrypt = require('bcrypt');
 var conn = require('./db');
 var session = require('express-session');
 
-app.use(session({
+app.use(
+  session({
     secret: 'secret',
     resave: true,
-    saveUninitialized: true
-}));
+    saveUninitialized: true,
+  }),
+);
 
 // Set up the view engine
 app.set('view engine', 'ejs');
@@ -34,21 +36,52 @@ app.get('/register', function (req, res) {
 
 // Routes product page
 app.get('/product', function (req, res) {
-    if (!req.session.loggedIn) {
-        res.redirect('/login');
-        res.end();
-    }else{
-        res.render('products');
-    }
+  if (!req.session.loggedIn) {
+    res.redirect('/login');
+    res.end();
+  } else {
+    res.render('products');
+  }
 });
-
 
 // Route for logout
 app.get('/logout', function (req, res) {
-    req.session.destroy();
-    res.redirect('/');
+  req.session.destroy();
+  res.redirect('/');
+  res.end();
+  console.log('User logged out');
+});
+
+// Route admin dashboard
+app.get('/dashboard', function (req, res) {
+  if (!req.session.loggedIn) {
+    res.redirect('/login');
     res.end();
-    console.log('User logged out');
+  } else {
+    // Check if the user is an admin
+    // Get the user from the database
+    conn.query('SELECT * FROM users WHERE username = ?', [req.session.username], function (error, results, fields) {
+      if (error) throw error;
+      console.log('User found in database', results);
+
+      if (results.length > 0) {
+        var user = results[0];
+        console.log('User', user);
+        if (user.is_admin) {
+          console.log('User is admin');
+          res.render('dashboard');
+        }else{
+          console.log('User is not admin');
+          res.redirect('/product');
+          res.end();
+        }
+      } else {
+        console.log('User not found');
+        res.redirect('/');
+        res.end();
+      }
+    });
+  }
 });
 
 // Registration Process
@@ -111,55 +144,49 @@ app.post('/auth', function (request, response) {
 
 // Process rating submission
 app.post('/submit_ratings', function (req, res) {
+  if (!req.session.loggedIn) {
+    res.redirect('/login');
+    res.end();
+  }
 
-    if (!req.session.loggedIn) {
-        res.redirect('/login');
-        res.end();
-    }
+  console.log('Rating Submission', req.body);
 
-    console.log('Rating Submission', req.body);
+  // Who rated the product
+  console.log('User', req.session.username);
 
-    // Who rated the product
-    console.log('User', req.session.username);
+  // TODO: check if the user has already rated the product
+  // If the user has already rated the product, update the rating
 
+  // Process the rating submission
 
-    // TODO: check if the user has already rated the product
-    // If the user has already rated the product, update the rating
+  var ratings = [
+    {
+      'product_id': 1,
+      'rating': req.body.rating_product1,
+    },
+    {
+      'product_id': 2,
+      'rating': req.body.rating_product2,
+    },
+    {
+      'product_id': 3,
+      'rating': req.body.rating_product3,
+    },
+  ];
+  console.log('Ratings', ratings);
+  // Add to database
 
-    // Process the rating submission
-
-        var ratings = [
-            {
-                "product_id": 1,
-                "rating": req.body.rating_product1
-            },
-            {
-                "product_id": 2,
-                "rating": req.body.rating_product2
-            },
-            {
-                "product_id": 3,
-                "rating": req.body.rating_product3
-            },
-        ]
-        console.log('Ratings', ratings);
-    // Add to database
-
-        for (var i=0; i<ratings.length; i++) {
-            conn.query(
-                'INSERT INTO ratings (product_id, rating, user) VALUES (?, ?, ?)',
-                [ratings[i].product_id, ratings[i].rating, req.session.username],
-                function (error, results, fields) {
-                    if (error) throw error;
-                    console.log('Rating added to database');
-                },
-            );
-        }
-
-
+  for (var i = 0; i < ratings.length; i++) {
+    conn.query(
+      'INSERT INTO ratings (product_id, rating, user) VALUES (?, ?, ?)',
+      [ratings[i].product_id, ratings[i].rating, req.session.username],
+      function (error, results, fields) {
+        if (error) throw error;
+        console.log('Rating added to database');
+      },
+    );
+  }
 });
-
-
 
 app.listen(3000);
 console.log('Server started on port 3000');
