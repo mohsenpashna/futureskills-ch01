@@ -69,8 +69,14 @@ app.get('/dashboard', function (req, res) {
         console.log('User', user);
         if (user.is_admin) {
           console.log('User is admin');
-          res.render('dashboard');
-        }else{
+
+          // Get all the ratings from the database
+          conn.query('SELECT * FROM ratings', function (error, results, fields) {
+            if (error) throw error;
+            console.log('Ratings From database', results);
+            res.render('dashboard', { ratings: results });
+          });
+        } else {
           console.log('User is not admin');
           res.redirect('/product');
           res.end();

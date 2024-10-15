@@ -1,3 +1,7 @@
-<h1>
-    Welcome to the dashboard page
-</h1>
+<h1>Welcome to the dashboard page</h1>
+
+<% ratings.forEach(product => { %>
+<p>
+  <td>Product ID: <%= product.product_id %> : has been rated <%= product.rating %> from user: <%= product.user %></td>
+</p>
+<% }) %>
