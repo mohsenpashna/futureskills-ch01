@@ -70,10 +70,27 @@ app.get('/dashboard', function (req, res) {
         if (user.is_admin) {
           console.log('User is admin');
 
-          // Get all the ratings from the database
+          // Fetch all the ratings from the database
+
           conn.query('SELECT * FROM ratings', function (error, results, fields) {
             if (error) throw error;
             console.log('Ratings From database', results);
+
+            // Create a histogram of the ratings
+
+            var histogram = {
+              '1': { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
+              '2': { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
+              '3': { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
+            };
+
+            for (var i = 0; i < results.length; i++) {
+              var rating = results[i];
+              histogram[rating.product_id][rating.rating]++;
+            }
+
+            console.log('Histogram', histogram);
+
             res.render('dashboard', { ratings: results });
           });
         } else {
