@@ -91,7 +91,7 @@ app.get('/dashboard', function (req, res) {
 
             console.log('Histogram', histogram);
 
-            res.render('dashboard', { ratings: results });
+            res.render('dashboard', { ratings: histogram });
           });
         } else {
           console.log('User is not admin');
