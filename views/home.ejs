@@ -1,5 +1,80 @@
-<h1>Welcome to the home page</h1>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Example with D3.js</title>
+    <!-- Include D3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+  </head>
 
-<p>Click <a href="/login">here</a> to login.</p>
+  <body>
+    <h1>Welcome to the home page</h1>
 
-<p>Click <a href="/register">here</a> to register.</p>
+    <p>Click <a href="/login">here</a> to login.</p>
+
+    <p>Click <a href="/register">here</a> to register.</p>
+
+    <div>Product 1 :  <div id="p1_chart"></div>
+    <div>Product 2 :  <div id="p2_chart"></div>
+    <div>Product 3 :  <div id="p3_chart"></div>
+
+      <% if (ratings) { %>
+      <script>
+        // JavaScript code to use D3.js with the `data` variable passed from the server
+        const histogramData = <%- JSON.stringify( ratings) %>;
+
+        // set the dimensions and margins of the graph
+        var width = 200
+            height = 200
+            margin = 40
+
+        // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+        var radius = Math.min(width, height) / 2 - margin
+
+          // Loop through products 1, 2, 3
+
+          for (const el of ['1','2','3']) {
+            var chartName = 'p'+el+'_chart'; 
+            console.log("Histogram", histogramData[el], chartName);
+            var svg = d3.select("#"+chartName)
+          .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+          .append("g")
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");   
+
+            var data = histogramData[el]
+                  
+      // set the color scale
+      var color = d3.scaleOrdinal()
+        .domain(data)
+        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"])
+
+      // Compute the position of each group on the pie:
+      var pie = d3.pie()
+        .value(function(d) {return d.value; })
+      var data_ready = pie(d3.entries(data))
+
+      svg
+        .selectAll('whatever')
+        .data(data_ready)
+        .enter()
+        .append('path')
+        .attr('d', d3.arc()
+          .innerRadius(0)
+          .outerRadius(radius)
+        )
+        .attr('fill', function(d){ return(color(d.data.key)) })
+        .attr("stroke", "black")
+        .style("stroke-width", "2px")
+        .style("opacity", 0.7)
+
+          }
+      </script>
+      <% } else { %>
+      <p>No data available</p>
+      <% } %>
+    </div>
+  </body>
+</html>

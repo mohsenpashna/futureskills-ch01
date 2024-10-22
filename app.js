@@ -4,6 +4,7 @@ var bcrypt = require('bcrypt');
 var conn = require('./db');
 var session = require('express-session');
 
+
 app.use(
   session({
     secret: 'secret',
@@ -19,9 +20,33 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+
 // Routes home
 app.get('/', function (req, res) {
-  res.render('home');
+
+  conn.query('SELECT * FROM ratings', function (error, results, fields) {
+    if (error) throw error;
+    console.log('Ratings From database', results);
+
+    // get histogram of each product_id ratings
+
+    var histogram = {
+      '1': { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
+      '2': { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
+      '3': { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
+    };
+
+    for (var i = 0; i < results.length; i++) {
+      var rating = results[i];
+      histogram[rating.product_id][rating.rating]++;
+    }
+
+    console.log('Histogram', histogram);
+
+
+    res.render('home', { ratings: histogram });
+  });
+
 });
 
 // Routes login
