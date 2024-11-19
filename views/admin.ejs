@@ -1,0 +1,38 @@
+
+<% if (commentsData) { %>
+
+
+    <script>
+        var receivedData = <%- JSON.stringify(commentsData) %>;
+        console.log(receivedData);
+    </script>
+
+    <h2>Comments</h2>
+
+
+
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Message</th>
+            <th>Email</th>
+        </tr>
+        <% for (var comment of commentsData) { %>
+            <tr>
+                <td><%= comment.title %></td>
+                <td><%= comment.message %></td>
+                <td><%= comment.email %></td>
+                <td><%= comment.date %></td>
+            </tr>
+        <% } %>
+
+        <!-- <p>
+            <%- JSON.stringify(commentsData) %>
+        </p> -->
+
+
+<% } else {%>
+
+    <h2>No ratings yet</h2>
+
+<% } %>

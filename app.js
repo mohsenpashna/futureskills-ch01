@@ -211,5 +211,37 @@ app.post('/submit_ratings', function (req, res) {
   }
 });
 
+app.get('/comments', function (req, res) {
+  res.render('comments');
+});
+
+app.post('/addcomments', function (req, res) {
+  console.log('Comment Submission', req.body);
+
+  conn.query(
+    'INSERT INTO comments (title, message, email) VALUES (?, ?, ?)',
+    [req.body.title, req.body.message, req.body.email],
+    function (error, results, fields) {
+      if (error) throw error;
+      console.log('Comments added to database');
+      res.redirect('/comments');
+    },
+  );
+});
+
+
+app.get('/admin', function (req, res) {
+
+  // Fetch all the comments from the database
+
+  conn.query('SELECT * FROM comments', function (error, results, fields) {
+    if (error) throw error;
+    console.log('Comments From database', results);
+    res.render('admin', { commentsData: results });
+  });
+
+
+});
+
 app.listen(3000);
 console.log('Server started on port 3000');
