@@ -5,5 +5,12 @@
     "express": "^4.21.1",
     "express-session": "^1.18.1",
     "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.8"
+  },
+  "scripts": {
+    "test": "vitest",
+    "start": "node app.js"
   }
 }
