@@ -40,7 +40,7 @@ app.get('/product', l.routeProductPageFn);
 app.get('/logout', l.logOutFn);
 
 // Route admin dashboard
-app.get('/dashboard', l.routeAdminPageFn);
+app.get('/dashboard', l.routeAdminDashboardPageFn);
 
 // Registration Process
 app.post('/reg', l.registerFn);

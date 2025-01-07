@@ -10,7 +10,7 @@ function routeProductPage(req, res) {
   }
 }
 
-function routeAdminPage(req, res) {
+function routeAdminDashboardPage(req, res) {
   if (!req.session.loggedIn) {
     res.redirect('/login');
     res.end();
@@ -63,8 +63,6 @@ function routeAdminPage(req, res) {
     });
   }
 }
-
-
 
 function register(request, response) {
   console.log('Register Request', request.body);
@@ -292,7 +290,7 @@ function logOut(req, res) {
 module.exports = {
     routeProductPageFn: routeProductPage,
     routeAdminPageFn: routeAdminPage,
-    routeAdminPageFn: routeAdminPage,
+    routeAdminDashboardPageFn: routeAdminDashboardPage,
     logOutFn: logOut,
     registerFn: register,
     authenticateFn: authenticate,

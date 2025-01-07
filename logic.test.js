@@ -19,8 +19,8 @@ describe('routeProductPage', () => {
 
     routeProductPage(req, res);
 
-    // expect(res.redirect).toHaveBeenCalledWith('/login');
-    // expect(res.end).toHaveBeenCalled();
+    expect(res.redirect).toHaveBeenCalledWith('/login');
+    expect(res.end).toHaveBeenCalled();
   });
 
   it('should render products page if logged in', () => {
@@ -39,7 +39,7 @@ describe('routeProductPage', () => {
 
     routeProductPage(req, res);
 
-    // expect(res.render).toHaveBeenCalledWith('products');
+    expect(res.render).toHaveBeenCalledWith('products');
     expect(req.session.loggedIn).toBe(true);
   });
 });
