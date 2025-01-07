@@ -1,10 +1,7 @@
 var express = require('express');
 var app = express();
-var bcrypt = require('bcrypt');
-var conn = require('./db');
 var session = require('express-session');
-
-
+var l = require('./logic');
 
 app.use(
   session({
@@ -36,61 +33,32 @@ app.get('/register', function (req, res) {
   res.render('register');
 });
 
-var routeProductPage = require('./logic');
 // Routes product page
-app.get('/product', routeProductPage);
+app.get('/product', l.routeProductPageFn);
 
 // Route for logout
-app.get('/logout', function (req, res) {
-  req.session.destroy();
-  res.redirect('/');
-  res.end();
-  console.log('User logged out');
-});
+app.get('/logout', l.logOutFn);
 
 // Route admin dashboard
-var routeAdminPage = require('./logic');
-app.get('/dashboard', routeAdminPage);
+app.get('/dashboard', l.routeAdminPageFn);
 
 // Registration Process
-var register = require('./logic');
-app.post('/reg', register);
+app.post('/reg', l.registerFn);
 
 // Login Process
-var authenticate = require('./logic');
-app.post('/auth', authenticate);
+app.post('/auth', l.authenticateFn);
 
 // Process rating submission
-// var ratingSubmission = require('./logic');
-// app.post('/submit_ratings', ratingSubmission);
+app.post('/submit_ratings', l.submitRatingsFn);
 
 app.get('/comments', function (req, res) {
   res.render('comments');
 });
 
-app.post('/addcomments', function (req, res) {
-  console.log('Comment Submission', req.body);
-
-  conn.query(
-    'INSERT INTO comments (title, message, email) VALUES (?, ?, ?)',
-    [req.body.title, req.body.message, req.body.email],
-    function (error, results, fields) {
-      if (error) throw error;
-      console.log('Comments added to database');
-      res.redirect('/comments');
-    },
-  );
-});
+app.post('/addcomments', l.addCommentsFn);
 
 
-app.get('/admin', function (req, res) {
-  // Fetch all the comments from the database
-  conn.query('SELECT * FROM comments', function (error, results, fields) {
-    if (error) throw error;
-    console.log('Comments From database', results);
-    res.render('admin', { commentsData: results });
-  });
-});
+app.get('/admin', l.renderAdminPageFn);
 
 app.listen(3000);
 console.log('Server started on port 3000');
