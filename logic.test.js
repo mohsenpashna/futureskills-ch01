@@ -1,45 +1,87 @@
 import { describe, it, expect, vi } from 'vitest';
-import routeProductPage from './logic';
+import { authenticateFn } from './logic';
+import bcrypt from 'bcrypt';
+const conn = require('./db');
 
-describe('routeProductPage', () => {
-  it('should redirect to /login if not logged in', () => {
-    const req = {
-      session: {
-        loggedIn: false,
-      },
-      body: {
-        username: 'admin',
-        password: 'admin',
-      },
+vi.mock('./db', () => ({
+  query: vi.fn(),
+}));
+
+
+describe('authenticate', () => {
+  it('should redirect to /product if login is successful', async () => {
+    const request = {
+      body: { username: 'testuser', password: 'password' },
+      session: {},
     };
-    const res = {
+    const response = {
       redirect: vi.fn(),
       end: vi.fn(),
     };
 
-    routeProductPage(req, res);
+    const user = { username: 'testuser', password: bcrypt.hashSync('password', 10) };
+    conn.query.mockImplementation((query, values, callback) => {
+      callback(null, [user]);
+    });
 
-    expect(res.redirect).toHaveBeenCalledWith('/login');
-    expect(res.end).toHaveBeenCalled();
+    await authenticateFn(request, response);
+
+    expect(response.redirect).toHaveBeenCalledWith('/product');
+    expect(request.session.username).toBe('testuser');
+    expect(request.session.loggedIn).toBe(true);
   });
 
-  it('should render products page if logged in', () => {
-    const req = {
-      session: {
-        loggedIn: true,
-      },
-      body: {
-        username: 'admin',
-        password: 'admin',
-      },
+  it('should redirect to /login if password does not match', async () => {
+    const request = {
+      body: { username: 'testuser', password: 'wrongpassword' },
+      session: {},
     };
-    const res = {
-      render: vi.fn(),
+    const response = {
+      redirect: vi.fn(),
+      end: vi.fn(),
     };
 
-    routeProductPage(req, res);
+    const user = { username: 'testuser', password: bcrypt.hashSync('password', 10) };
+    conn.query.mockImplementation((query, values, callback) => {
+      callback(null, [user]);
+    });
 
-    expect(res.render).toHaveBeenCalledWith('products');
-    expect(req.session.loggedIn).toBe(true);
+    await authenticateFn(request, response);
+
+    expect(response.redirect).toHaveBeenCalledWith('/login');
+  });
+
+  it('should send "User not found" if user does not exist', async () => {
+    const request = {
+      body: { username: 'nonexistentuser', password: 'password' },
+      session: {},
+    };
+    const response = {
+      send: vi.fn(),
+    };
+
+    conn.query.mockImplementation((query, values, callback) => {
+      callback(null, []);
+    });
+
+    await authenticateFn(request, response);
+
+    expect(response.send).toHaveBeenCalledWith('User not found');
+  });
+
+  it('should throw an error if there is a database error', async () => {
+    const request = {
+      body: { username: 'testuser', password: 'password' },
+      session: {},
+    };
+    const response = {
+      send: vi.fn(),
+    };
+
+    conn.query.mockImplementation((query, values, callback) => {
+      callback(new Error('Database error'), null);
+    });
+
+    expect(() => authenticateFn(request, response)).toThrow('Database error');
   });
 });
