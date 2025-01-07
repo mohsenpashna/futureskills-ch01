@@ -58,7 +58,7 @@ app.get('/comments', function (req, res) {
 app.post('/addcomments', l.addCommentsFn);
 
 
-app.get('/admin', l.renderAdminPageFn);
+app.get('/admin', l.routeAdminPageFn);
 
 app.listen(3000);
 console.log('Server started on port 3000');

@@ -122,51 +122,6 @@ function authenticate(request, response) {
   });
 }
 
-function ratingSubmission(req, res) {
-  if (!req.session.loggedIn) {
-    res.redirect('/login');
-    res.end();
-  }
-
-  console.log('Rating Submission', req.body);
-
-  // Who rated the product
-  console.log('User', req.session.username);
-
-  // TODO: check if the user has already rated the product
-  // If the user has already rated the product, update the rating
-
-  // Process the rating submission
-
-  var ratings = [
-    {
-      'product_id': 1,
-      'rating': req.body.rating_product1,
-    },
-    {
-      'product_id': 2,
-      'rating': req.body.rating_product2,
-    },
-    {
-      'product_id': 3,
-      'rating': req.body.rating_product3,
-    },
-  ];
-  console.log('Ratings', ratings);
-  // Add to database
-
-  for (var i = 0; i < ratings.length; i++) {
-    conn.query(
-      'INSERT INTO ratings (product_id, rating, user) VALUES (?, ?, ?)',
-      [ratings[i].product_id, ratings[i].rating, req.session.username],
-      function (error, results, fields) {
-        if (error) throw error;
-        console.log('Rating added to database');
-      },
-    );
-  }
-}
-
 function routeAdminPage(req, res) {
   if (!req.session.loggedIn) {
     res.redirect('/login');
@@ -308,7 +263,7 @@ function addComments(req, res) {
   );
 }
 
-function renderAdminPage(req, res) {
+function routeAdminPage(req, res) {
   // Fetch all the comments from the database
   conn.query('SELECT * FROM comments', function (error, results, fields) {
     if (error) throw error;
@@ -337,11 +292,10 @@ function logOut(req, res) {
 module.exports = {
     routeProductPageFn: routeProductPage,
     routeAdminPageFn: routeAdminPage,
+    routeAdminPageFn: routeAdminPage,
+    logOutFn: logOut,
     registerFn: register,
     authenticateFn: authenticate,
-    ratingSubmissionFn: ratingSubmission,
     submitRatingsFn: submitRatings,
     addCommentsFn: addComments,
-    renderAdminPageFn: renderAdminPage,
-    logOutFn: logOut,
 };
