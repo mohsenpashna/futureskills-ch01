@@ -1,7 +1,7 @@
-var express = require('express');
-var app = express();
-var session = require('express-session');
-var l = require('./logic');
+const express = require('express');
+const app = express();
+const session = require('express-session');
+const logic = require('./logic');
 
 app.use(
   session({
@@ -34,31 +34,31 @@ app.get('/register', function (req, res) {
 });
 
 // Routes product page
-app.get('/product', l.routeProductPageFn);
+app.get('/product', logic.routeProductPageFn);
 
 // Route for logout
-app.get('/logout', l.logOutFn);
+app.get('/logout', logic.logOutFn);
 
 // Route admin dashboard
-app.get('/dashboard', l.routeAdminDashboardPageFn);
+app.get('/dashboard', logic.routeAdminDashboardPageFn);
 
 // Registration Process
-app.post('/reg', l.registerFn);
+app.post('/reg', logic.registerFn);
 
 // Login Process
-app.post('/auth', l.authenticateFn);
+app.post('/auth', logic.authenticateFn);
 
 // Process rating submission
-app.post('/submit_ratings', l.submitRatingsFn);
+app.post('/submit_ratings', logic.submitRatingsFn);
 
 app.get('/comments', function (req, res) {
   res.render('comments');
 });
 
-app.post('/addcomments', l.addCommentsFn);
+app.post('/addcomments', logic.addCommentsFn);
 
 
-app.get('/admin', l.routeAdminPageFn);
+app.get('/admin', logic.routeAdminPageFn);
 
 app.listen(3000);
 console.log('Server started on port 3000');
