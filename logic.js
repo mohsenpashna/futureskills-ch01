@@ -1,14 +1,6 @@
 var conn = require('./db');
 var bcrypt = require('bcrypt');
 
-function routeProductPage(req, res) {
-  if (!req.session.loggedIn) {
-    res.redirect('/login');
-    res.end();
-  } else {
-    res.render('products');
-  }
-}
 
 function routeAdminDashboardPage(req, res) {
   if (!req.session.loggedIn) {
@@ -32,22 +24,9 @@ function routeAdminDashboardPage(req, res) {
           conn.query('SELECT * FROM ratings', function (error, results, fields) {
             if (error) throw error;
             console.log('Ratings From database', results);
-
             // Create a histogram of the ratings
-
-            var histogram = {
-              '1': { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
-              '2': { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
-              '3': { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
-            };
-
-            for (var i = 0; i < results.length; i++) {
-              var rating = results[i];
-              histogram[rating.product_id][rating.rating]++;
-            }
-
+            const histogram = processHistogram(results);
             console.log('Histogram', histogram);
-
             res.render('dashboard', { ratings: histogram });
           });
         } else {
@@ -62,6 +41,20 @@ function routeAdminDashboardPage(req, res) {
       }
     });
   }
+}
+
+function processHistogram(results) {
+  var histogram = {
+    '1': { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
+    '2': { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
+    '3': { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 },
+  };
+
+  for (var i = 0; i < results.length; i++) {
+    var rating = results[i];
+    histogram[rating.product_id][rating.rating]++;
+  }
+  return histogram;
 }
 
 function register(request, response) {
@@ -174,33 +167,7 @@ function routeAdminPage(req, res) {
   }
 }
 
-function register(request, response) {
-  console.log('Register Request', request.body);
 
-  if (request.body.password != request.body.password_confirm) {
-    console.log('Password not match');
-    response.redirect('/register');
-    response.end();
-  } else {
-    console.log('Password match');
-    // Hash the password
-
-    var hashedPassword = bcrypt.hashSync(request.body.password, 10);
-    console.log('Hashed Password', hashedPassword);
-
-    // ADD TO DATABASE
-
-    conn.query(
-      'INSERT INTO users (username, password) VALUES (?, ?)',
-      [request.body.username, hashedPassword],
-      function (error, results, fields) {
-        if (error) throw error;
-        console.log('User added to database');
-        response.redirect('/login');
-      },
-    );
-  }
-}
 
 function submitRatings(req, res) {
   if (!req.session.loggedIn) {
@@ -261,14 +228,7 @@ function addComments(req, res) {
   );
 }
 
-function routeAdminPage(req, res) {
-  // Fetch all the comments from the database
-  conn.query('SELECT * FROM comments', function (error, results, fields) {
-    if (error) throw error;
-    console.log('Comments From database', results);
-    res.render('admin', { commentsData: results });
-  });
-}
+
 
 function routeProductPage(req, res) {
   if (!req.session.loggedIn) {
