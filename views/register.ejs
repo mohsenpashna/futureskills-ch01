@@ -1,19 +1,93 @@
-<h1>Register page</h1>
-
-<form action="/reg", method="post">
-  <p>
-    <label for="username">Username:</label>
-    <input type="text" name="username" placeholder="username" required />
-  </p>
-  <p>
-    <label for="password">Password:</label>
-    <input type="password" name="password" placeholder="password" required />
-  </p>
-  <p>
-    <label for="password_confirm">Password:</label>
-    <input type="password" name="password_confirm" placeholder="password_confirm" required />
-  </p>
-  <p>
-    <button type="submit">Create Account</button>
-  </p>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Product Rating System</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            padding: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .btn {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Register</h1>
+            <p>Create your account</p>
+        </div>
+        
+        <div class="content">
+            <div class="password-requirements">
+                <h4>Password Requirements:</h4>
+                <ul>
+                    <li>At least 6 characters long</li>
+                    <li>Must match confirmation</li>
+                </ul>
+            </div>
+            
+            <form action="/reg" method="post">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" placeholder="Choose a username" required />
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" placeholder="Create a password" required minlength="6" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="password_confirm">Confirm Password:</label>
+                    <input type="password" id="password_confirm" name="password_confirm" placeholder="Confirm your password" required minlength="6" />
+                </div>
+                
+                <button type="submit" class="btn">Create Account</button>
+            </form>
+            
+            <div class="links">
+                <p>Already have an account? <a href="/login">Login here</a></p>
+                <p><a href="/">← Back to Home</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Client-side password validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('password_confirm').value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Passwords do not match!');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!-- Navigation Bar Component -->
+<div class="nav">
+    <div>
+        <a href="/product">Products</a>
+        <!-- <a href="/comments">Comments</a> -->
+        <% if (typeof username !== 'undefined' && username) { %>
+            <!-- Show admin links only if user exists and has admin privileges -->
+            <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+                <a href="/dashboard">Dashboard</a>
+                <a href="/admin">Admin Panel</a>
+            <% } else { %>
+                <!-- Show dashboard link for all users, but access will be controlled server-side -->
+                <a href="/dashboard">Dashboard</a>
+                <a href="/admin">Admin</a>
+            <% } %>
+        <% } %>
+    </div>
+    <div>
+        <% if (typeof username !== 'undefined' && username) { %>
+            <span class="welcome">
+                Welcome, <%= username %>!
+                <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+                    <span class="admin-badge">(Admin)</span>
+                <% } %>
+            </span>
+            <a href="/logout">Logout</a>
+        <% } else { %>
+            <span class="welcome">Guest User</span>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        <% } %>
+    </div>
+</div>

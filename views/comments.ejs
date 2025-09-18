@@ -1,23 +1,70 @@
-<h1>Comments page</h1>
-
-<form action="/addcomments" method="post">
-  <p>
-    <label for="title">title:</label>
-    <input type="text" name="title" placeholder="title" />
-  </p>
-
-  <p>
-    <label for="message">message:</label>
-    <input type="text" name="message" placeholder="message" required/>
-  </p>
-
-  <p>
-    <label for="email">email:</label>
-    <input type="text" name="email" placeholder="email" required/>
-  </p>
-
-
-  <p>
-    <button type="submit">Submit</button>
-  </p>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comments - Product Rating System</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        .container {
+            max-width: 800px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💬 Comments & Feedback</h1>
+            <p>Share your thoughts and suggestions with us</p>
+        </div>
+        
+        <%- include('partials/navbar') %>
+        
+        <div class="content">
+            <div class="info-box">
+                <strong>📝 Share Your Experience:</strong> Your feedback helps us improve our products and services. All comments are reviewed by our team.
+            </div>
+            
+            <script>
+                // Check for success message in URL
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('success') === 'comment_added') {
+                    document.write('<div class="success-message">✓ Thank you! Your comment has been submitted successfully.</div>');
+                }
+            </script>
+            
+            <div class="form-section">
+                <h2 class="form-title">Submit Your Feedback</h2>
+                
+                <form action="/addcomments" method="post">
+                    <div class="form-group">
+                        <label for="title">Subject/Title:</label>
+                        <input type="text" id="title" name="title" placeholder="Brief subject of your comment (optional)" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Your Message: *</label>
+                        <textarea id="message" name="message" placeholder="Share your thoughts, suggestions, or feedback..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Your Email: *</label>
+                        <input type="email" id="email" name="email" placeholder="your.email@example.com" required />
+                    </div>
+                    
+                    <button type="submit" class="btn">Submit Comment</button>
+                </form>
+            </div>
+            
+            <div style="text-align: center; color: #666; font-size: 14px;">
+                <p>* Required fields</p>
+                <p>Your email will be kept private and used only for follow-up if needed.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

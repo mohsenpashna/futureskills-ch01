@@ -1,5 +1,59 @@
-<h1>Welcome to the home page</h1>
-
-<p>Click <a href="/login">here</a> to login.</p>
-
-<p>Click <a href="/register">here</a> to register.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Rating System - Home</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            padding: 40px 30px;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 Product Rating</h1>
+            <p>Rate, Review & Discover</p>
+        </div>
+        
+        <div class="content">
+            <div class="welcome-text">
+                Welcome to our product rating platform! Share your opinions and discover what others think about the latest products.
+            </div>
+            
+            <div class="button-group">
+                <a href="/login" class="btn btn-primary">Login to Your Account</a>
+                <a href="/register" class="btn btn-secondary">Create New Account</a>
+            </div>
+            
+            <div class="features">
+                <h3>What You Can Do:</h3>
+                <ul class="feature-list">
+                    <li>Rate products from 1 to 5 stars</li>
+                    <li>View average ratings and reviews</li>
+                    <li>Leave comments and feedback</li>
+                    <li>Access admin dashboard (if authorized)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

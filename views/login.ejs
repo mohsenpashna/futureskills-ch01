@@ -1,16 +1,73 @@
-<h1>Login page</h1>
-
-<form action="/auth" method="post">
-  <p>
-    <label for="username">Username:</label>
-    <input type="text" name="username" placeholder="username" required />
-  </p>
-  <p>
-    <label for="password">Password:</label>
-    <input type="password" name="password" placeholder="password" required />
-  </p>
-
-  <p>
-    <button type="submit">Login</button>
-  </p>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Product Rating System</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            padding: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .btn {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Login</h1>
+            <p>Welcome back!</p>
+        </div>
+        
+        <div class="content">
+            <div class="demo-info">
+                <strong>Demo Account:</strong><br>
+                Username: <code>admin</code><br>
+                Password: <code>admin123</code>
+            </div>
+            
+            <form action="/auth" method="post">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required />
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required />
+                </div>
+                
+                <button type="submit" class="btn">Login</button>
+            </form>
+            
+            <div class="links">
+                <p>Don't have an account? <a href="/register">Register here</a></p>
+                <p><a href="/">← Back to Home</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

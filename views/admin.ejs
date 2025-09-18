@@ -1,38 +1,116 @@
-
-<% if (commentsData) { %>
-
-
-    <script>
-        var receivedData = <%- JSON.stringify(commentsData) %>;
-        console.log(receivedData);
-    </script>
-
-    <h2>Comments</h2>
-
-
-
-    <table>
-        <tr>
-            <th>Title</th>
-            <th>Message</th>
-            <th>Email</th>
-        </tr>
-        <% for (var comment of commentsData) { %>
-            <tr>
-                <td><%= comment.title %></td>
-                <td><%= comment.message %></td>
-                <td><%= comment.email %></td>
-                <td><%= comment.date %></td>
-            </tr>
-        <% } %>
-
-        <!-- <p>
-            <%- JSON.stringify(commentsData) %>
-        </p> -->
-
-
-<% } else {%>
-
-    <h2>No ratings yet</h2>
-
-<% } %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Product Rating System</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛠️ Admin Panel</h1>
+            <p>Manage Comments & User Feedback</p>
+        </div>
+        
+        <%- include('partials/navbar') %>
+        
+        <div class="content">
+            <div class="admin-note">
+                <strong>🔒 Admin Access:</strong> This panel allows you to view and manage all user comments and feedback.
+            </div>
+            
+            <% if (commentsData && commentsData.length > 0) { %>
+                <div class="stats-bar">
+                    <h3>📊 Comments Overview</h3>
+                    <p><strong><%= commentsData.length %></strong> total comments received</p>
+                </div>
+                
+                <div class="comments-section">
+                    <h2 class="section-title">💬 User Comments & Feedback</h2>
+                    
+                    <div class="filter-bar">
+                        <label for="search">🔍 Search:</label>
+                        <input type="text" id="search" class="filter-input" placeholder="Search comments..." onkeyup="filterComments()">
+                        <label for="emailFilter">📧 Filter by Email:</label>
+                        <input type="text" id="emailFilter" class="filter-input" placeholder="Filter by email..." onkeyup="filterComments()">
+                    </div>
+                    
+                    <table class="comments-table" id="commentsTable">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Message</th>
+                                <th>Email</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (var comment of commentsData) { %>
+                                <tr>
+                                    <td>
+                                        <div class="comment-title">
+                                            <%= comment.title || 'No Title' %>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="comment-message">
+                                            <%= comment.message %>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="comment-email">
+                                            <%= comment.email %>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="comment-date">
+                                            <%= new Date(comment.date).toLocaleDateString() %><br>
+                                            <%= new Date(comment.date).toLocaleTimeString() %>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <script>
+                    var commentsData = <%- JSON.stringify(commentsData) %>;
+                    console.log('Comments data:', commentsData);
+                    
+                    function filterComments() {
+                        var searchTerm = document.getElementById('search').value.toLowerCase();
+                        var emailFilter = document.getElementById('emailFilter').value.toLowerCase();
+                        var table = document.getElementById('commentsTable');
+                        var rows = table.getElementsByTagName('tr');
+                        
+                        for (var i = 1; i < rows.length; i++) { // Start from 1 to skip header
+                            var row = rows[i];
+                            var title = row.cells[0].textContent.toLowerCase();
+                            var message = row.cells[1].textContent.toLowerCase();
+                            var email = row.cells[2].textContent.toLowerCase();
+                            
+                            var matchesSearch = title.includes(searchTerm) || message.includes(searchTerm);
+                            var matchesEmail = email.includes(emailFilter);
+                            
+                            if (matchesSearch && matchesEmail) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        }
+                    }
+                </script>
+                
+            <% } else { %>
+                <div class="no-comments">
+                    <h2>📭 No Comments Yet</h2>
+                    <p>No user feedback has been submitted yet. Comments will appear here once users start providing feedback.</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>

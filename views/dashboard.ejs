@@ -1,88 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Home</title>
-  <!-- Load d3.js -->
-  <script src="https://d3js.org/d3.v4.js"></script>
-  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-</head>
-
-<body>
-  <h1>Welcome to the dashboard page</h1>
-
-  <h2>Product 1</h2>
-  <div id="my_dataviz_1"></div>
-
-  <h2>Product 2</h2>
-  <div id="my_dataviz_2"></div>
-
-  <h2>Product 3</h2>
-  <div id="my_dataviz_3"></div>
-
-  <% if (ratings) { %>
-
-  <script>
-              var ratings = <%- JSON.stringify(ratings) %>;
-
-        // set the dimensions and margins of the graph
-        var width = 250
-          height = 250
-          margin = 40
-
-        // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
-        var radius = Math.min(width, height) / 2 - margin
-
-        for (var el of ['1','2','3']){
-        // append the svg object to the div called 'my_dataviz'
-        var svg = d3.select("#my_dataviz_"+el)
-        .append("svg")
-          .attr("width", width)
-          .attr("height", height)
-        .append("g")
-          .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-        var data =ratings[el];
-
-        // set the color scale
-        var color = d3.scaleOrdinal()
-          .domain(data)
-          .range(d3.schemeSet2);
-
-        // Compute the position of each group on the pie:
-        var pie = d3.pie()
-        .value(function(d) {return d.value; })
-        var data_ready = pie(d3.entries(data))
-
-
-       // shape helper to build arcs:
-      var arcGenerator = d3.arc()
-        .innerRadius(0)
-        .outerRadius(radius)
-
-
-    // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
-    svg
-      .selectAll('mySlices')
-      .data(data_ready)
-      .enter()
-      .append('path')
-        .attr('d', arcGenerator)
-        .attr('fill', function(d){ return(color(d.data.key)) })
-        .attr("stroke", "black")
-        .style("stroke-width", "2px")
-        .style("opacity", 0.7)
-
-    // Now add the annotation. Use the centroid method to get the best coordinates
-    svg
-      .selectAll('mySlices')
-      .data(data_ready)
-      .enter()
-      .append('text')
-      .text(function(d){  if (d.data.value !=0) {return d.data.key}else{return ""} })
-      .attr("transform", function(d) { return "translate(" + arcGenerator.centroid(d) + ")";  })
-      .style("text-anchor", "middle")
-      .style("font-size", 17)
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Product Rating System</title>
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        .container {
+            max-width: 1400px;
         }
-  </script>
-
-  <% }else { %> <% } %>
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Admin Dashboard</h1>
+            <p>Product Rating Analytics & Insights</p>
+        </div>
+        
+        <%- include('partials/navbar') %>
+        
+        <div class="content">
+            <div class="admin-note">
+                <strong>🔒 Admin Access:</strong> This dashboard is only accessible to administrators and shows comprehensive rating analytics.
+            </div>
+            
+            <% if (ratings) { %>
+                <div class="stats-summary">
+                    <h2>Rating Overview</h2>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number" id="total-ratings">0</div>
+                            <div class="stat-label">Total Ratings</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="avg-rating">0</div>
+                            <div class="stat-label">Average Rating</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Products</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="most-popular">-</div>
+                            <div class="stat-label">Most Popular</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="chart-card">
+                        <div class="chart-title">🎧 Wireless Headphones</div>
+                        <div class="chart-container">
+                            <div id="my_dataviz_1"></div>
+                        </div>
+                        <div class="legend" id="legend_1"></div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-title">⌚ Smart Watch</div>
+                        <div class="chart-container">
+                            <div id="my_dataviz_2"></div>
+                        </div>
+                        <div class="legend" id="legend_2"></div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-title">🔊 Bluetooth Speaker</div>
+                        <div class="chart-container">
+                            <div id="my_dataviz_3"></div>
+                        </div>
+                        <div class="legend" id="legend_3"></div>
+                    </div>
+                </div>
+                
+                <script>
+                    var ratings = <%- JSON.stringify(ratings) %>;
+                    console.log('Ratings data:', ratings);
+                    
+                    // Calculate statistics
+                    var totalRatings = 0;
+                    var totalScore = 0;
+                    var productStats = {};
+                    
+                    for (var productId in ratings) {
+                        var productRatings = ratings[productId];
+                        var productTotal = 0;
+                        var productCount = 0;
+                        
+                        for (var rating in productRatings) {
+                            var count = productRatings[rating];
+                            totalRatings += count;
+                            productTotal += count;
+                            totalScore += (parseInt(rating) * count);
+                            productCount += count;
+                        }
+                        
+                        productStats[productId] = {
+                            total: productTotal,
+                            average: productCount > 0 ? (Object.keys(productRatings).reduce((sum, r) => sum + (parseInt(r) * productRatings[r]), 0) / productCount) : 0
+                        };
+                    }
+                    
+                    // Update statistics display
+                    document.getElementById('total-ratings').textContent = totalRatings;
+                    document.getElementById('avg-rating').textContent = totalRatings > 0 ? (totalScore / totalRatings).toFixed(1) : '0';
+                    
+                    // Find most popular product
+                    var mostPopular = Object.keys(productStats).reduce((a, b) => 
+                        productStats[a].total > productStats[b].total ? a : b
+                    );
+                    var productNames = {'1': 'Headphones', '2': 'Smart Watch', '3': 'Speaker'};
+                    document.getElementById('most-popular').textContent = productNames[mostPopular] || '-';
+                    
+                    // Chart dimensions
+                    var width = 280;
+                    var height = 280;
+                    var margin = 40;
+                    var radius = Math.min(width, height) / 2 - margin;
+                    
+                    // Color scheme
+                    var colors = ['#ff6b6b', '#ffa726', '#ffee58', '#66bb6a', '#42a5f5'];
+                    var ratingLabels = ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'];
+                    
+                    for (var el of ['1','2','3']) {
+                        var data = ratings[el];
+                        var hasData = Object.values(data).some(v => v > 0);
+                        
+                        if (!hasData) {
+                            document.getElementById('my_dataviz_' + el).innerHTML = 
+                                '<div style="color: #999; font-style: italic; padding: 50px;">No ratings yet</div>';
+                            continue;
+                        }
+                        
+                        // Create SVG
+                        var svg = d3.select("#my_dataviz_" + el)
+                            .append("svg")
+                            .attr("width", width)
+                            .attr("height", height)
+                            .append("g")
+                            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+                        
+                        // Color scale
+                        var color = d3.scaleOrdinal()
+                            .domain(['1', '2', '3', '4', '5'])
+                            .range(colors);
+                        
+                        // Pie layout
+                        var pie = d3.pie()
+                            .value(function(d) { return d.value; })
+                            .sort(null);
+                        
+                        var data_ready = pie(d3.entries(data).filter(d => d.value > 0));
+                        
+                        // Arc generator
+                        var arcGenerator = d3.arc()
+                            .innerRadius(0)
+                            .outerRadius(radius);
+                        
+                        // Create pie slices
+                        svg.selectAll('path')
+                            .data(data_ready)
+                            .enter()
+                            .append('path')
+                            .attr('d', arcGenerator)
+                            .attr('fill', function(d) { return color(d.data.key); })
+                            .attr("stroke", "white")
+                            .style("stroke-width", "3px")
+                            .style("opacity", 0.8)
+                            .on('mouseover', function(d) {
+                                d3.select(this).style('opacity', 1);
+                            })
+                            .on('mouseout', function(d) {
+                                d3.select(this).style('opacity', 0.8);
+                            });
+                        
+                        // Add labels
+                        svg.selectAll('text')
+                            .data(data_ready)
+                            .enter()
+                            .append('text')
+                            .text(function(d) { 
+                                return d.data.value > 0 ? d.data.value : '';
+                            })
+                            .attr("transform", function(d) { 
+                                return "translate(" + arcGenerator.centroid(d) + ")"; 
+                            })
+                            .style("text-anchor", "middle")
+                            .style("font-size", "16px")
+                            .style("font-weight", "bold")
+                            .style("fill", "white")
+                            .style("text-shadow", "1px 1px 2px rgba(0,0,0,0.5)");
+                        
+                        // Create legend
+                        var legend = d3.select("#legend_" + el);
+                        data_ready.forEach(function(d, i) {
+                            var legendItem = legend.append('div').attr('class', 'legend-item');
+                            legendItem.append('div')
+                                .attr('class', 'legend-color')
+                                .style('background-color', color(d.data.key));
+                            legendItem.append('span')
+                                .text(ratingLabels[parseInt(d.data.key) - 1] + ': ' + d.data.value);
+                        });
+                    }
+                </script>
+            <% } else { %>
+                <div class="no-data">
+                    <h2>📈 No Rating Data Available</h2>
+                    <p>Start rating products to see analytics here!</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
 </body>
+</html>
